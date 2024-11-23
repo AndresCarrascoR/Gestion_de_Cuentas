@@ -1,10 +1,15 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.timezone import now
+from .utils import consulta_ruc, consulta_dni
+from django.core.exceptions import ValidationError
 
 
 
-#Tabla de Usuarios
+
+# -------------------------
+# Modelo de Usuario
+# -------------------------
 class CustomUser(AbstractUser):
     ROLE_CHOICES = [
         ('admin', 'Administrador'),
@@ -14,24 +19,64 @@ class CustomUser(AbstractUser):
     role = models.CharField(
         max_length=20,
         choices=ROLE_CHOICES,
-        default='admin'  # Puedes cambiar el valor predeterminado según lo que necesites
+        default='admin'
     )
+
+    # Aseguramos que el username sea único en toda la base de datos
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['username'], name='unique_username')
+        ]
 
     def __str__(self):
         return f"{self.username} ({self.get_role_display()})"
 
 
-# Modelo para los Clientes
+# -------------------------
+# Modelo de Cliente
+# -------------------------
 class Cliente(models.Model):
-    nombre = models.CharField(max_length=255, unique=True, verbose_name="Nombre del cliente")
+    nombre = models.CharField(max_length=255, verbose_name="Nombre o Razón Social")
+    ruc = models.CharField(max_length=11, unique=True, verbose_name="RUC")
+    dni = models.CharField(max_length=8, unique=True, blank=True, null=True, verbose_name="DNI")
     direccion = models.TextField(blank=True, verbose_name="Dirección")
     telefono = models.CharField(max_length=15, blank=True, verbose_name="Teléfono")
     email = models.EmailField(blank=True, verbose_name="Correo electrónico")
+    estado = models.CharField(max_length=50, blank=True, verbose_name="Estado")
+
+    def actualizar_desde_ruc(self, token):
+        if not self.ruc:
+            return {"error": "El RUC es obligatorio para esta operación."}
+        datos = consulta_ruc(self.ruc, token)
+        if "error" not in datos:
+            self.nombre = datos.get("name", self.nombre)
+            self.direccion = datos.get("address", self.direccion)
+            self.estado = datos.get("status", self.estado)
+            self.save()
+        return datos
+
+    def actualizar_desde_dni(self, token):
+        if not self.dni:
+            return {"error": "El DNI es obligatorio para esta operación."}
+        datos = consulta_dni(self.dni, token)
+        if "error" not in datos:
+            self.nombre = datos.get("full_name", self.nombre)
+            self.direccion = datos.get("address", self.direccion)
+            self.save()
+        return datos
+
+    def save(self, *args, **kwargs):
+        if not self.ruc:
+            raise ValueError("El RUC es obligatorio para registrar un cliente.")
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.nombre
+        return f"{self.nombre} - RUC: {self.ruc}"
 
-# Modelo para los Proveedores
+
+# -------------------------
+# Modelo de Proveedor
+# -------------------------
 class Proveedor(models.Model):
     nombre = models.CharField(max_length=255, unique=True, verbose_name="Nombre del proveedor")
     direccion = models.TextField(blank=True, verbose_name="Dirección")
@@ -41,56 +86,49 @@ class Proveedor(models.Model):
     def __str__(self):
         return self.nombre
 
-# Modelo para las Facturas de Clientes
-class FacturaCliente(models.Model):
+
+# -------------------------
+# Base para Facturas
+# -------------------------
+class FacturaBase(models.Model):
     numero_factura = models.CharField(max_length=50, unique=True, verbose_name="Número de factura")
+    fecha_emision = models.DateField(default=now, verbose_name="Fecha de emisión")
+    fecha_vencimiento = models.DateField(verbose_name="Fecha de vencimiento")
+    monto_total = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Monto total")
+    ESTADOS = [
+        ('pendiente', 'Pendiente'),
+        ('pagada', 'Pagada'),
+        ('vencida', 'Vencida'),
+    ]
+    estado = models.CharField(max_length=10, choices=ESTADOS, default='pendiente', verbose_name="Estado")
+
+    class Meta:
+        abstract = True
+
+    def actualizar_estado(self):
+        if self.estado != 'pagada' and self.fecha_vencimiento < now().date():
+            self.estado = 'vencida'
+            self.save()
+
+    def __str__(self):
+        return f"Factura {self.numero_factura}"
+
+
+# -------------------------
+# Modelo de Facturas para Clientes
+# -------------------------
+class FacturaCliente(FacturaBase):
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, verbose_name="Cliente relacionado")
-    fecha_emision = models.DateField(default=now, verbose_name="Fecha de emisión")
-    fecha_vencimiento = models.DateField(verbose_name="Fecha de vencimiento")
-    monto_total = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Monto total")
-    ESTADOS = [
-        ('pendiente', 'Pendiente'),
-        ('pagada', 'Pagada'),
-        ('vencida', 'Vencida'),
-    ]
-    estado = models.CharField(max_length=10, choices=ESTADOS, default='pendiente', verbose_name="Estado")
-
-    def actualizar_estado(self):
-        """Actualiza el estado basado en la fecha de vencimiento"""
-        if self.estado != 'pagada' and self.fecha_vencimiento < now().date():
-            self.estado = 'vencida'
-            self.save()
 
     def __str__(self):
-        return f"Factura {self.numero_factura} - {self.cliente}"
+        return f"{super().__str__()} - Cliente: {self.cliente}"
 
-# Modelo para las Facturas de Proveedores
-class FacturaProveedor(models.Model):
-    numero_factura = models.CharField(max_length=50, unique=True, verbose_name="Número de factura")
+
+# -------------------------
+# Modelo de Facturas para Proveedores
+# -------------------------
+class FacturaProveedor(FacturaBase):
     proveedor = models.ForeignKey(Proveedor, on_delete=models.CASCADE, verbose_name="Proveedor relacionado")
-    fecha_emision = models.DateField(default=now, verbose_name="Fecha de emisión")
-    fecha_vencimiento = models.DateField(verbose_name="Fecha de vencimiento")
-    monto_total = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Monto total")
-    ESTADOS = [
-        ('pendiente', 'Pendiente'),
-        ('pagada', 'Pagada'),
-        ('vencida', 'Vencida'),
-    ]
-    estado = models.CharField(max_length=10, choices=ESTADOS, default='pendiente', verbose_name="Estado")
-
-    def actualizar_estado(self):
-        """Actualiza el estado basado en la fecha de vencimiento"""
-        if self.estado != 'pagada' and self.fecha_vencimiento < now().date():
-            self.estado = 'vencida'
-            self.save()
 
     def __str__(self):
-        return f"Factura {self.numero_factura} - {self.proveedor}"
-
-
-#token de prueba
-        #49d400db4cb31a20a95cedc2bec27e533d8debfcfac4530d31b5632e1571e4d5
-
-
-#
-#pip install -r requirements.txt
+        return f"{super().__str__()} - Proveedor: {self.proveedor}"

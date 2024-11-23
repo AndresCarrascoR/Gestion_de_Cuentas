@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser
+from .models import CustomUser, Cliente
 from django.core.exceptions import PermissionDenied
 from django.utils.timezone import now
 from django.contrib.admin import SimpleListFilter
@@ -53,3 +53,22 @@ class CustomUserAdmin(UserAdmin):
         if not request.user.role == 'admin' and obj.role == 'admin':
             raise PermissionDenied("No tienes permiso para crear un Administrador.")
         super().save_model(request, obj, form, change)
+
+@admin.action(description="Actualizar datos desde RUC")
+def actualizar_desde_ruc(modeladmin, request, queryset):
+    token = "TU_TOKEN"
+    for cliente in queryset:
+        if cliente.ruc:
+            cliente.actualizar_desde_ruc(token)
+
+@admin.action(description="Actualizar datos desde DNI")
+def actualizar_desde_dni(modeladmin, request, queryset):
+    token = "TU_TOKEN"
+    for cliente in queryset:
+        if cliente.dni:
+            cliente.actualizar_desde_dni(token)
+
+@admin.register(Cliente)
+class ClienteAdmin(admin.ModelAdmin):
+    list_display = ("nombre", "ruc", "dni", "direccion", "estado")
+    actions = [actualizar_desde_ruc, actualizar_desde_dni]

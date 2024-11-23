@@ -9,14 +9,14 @@ class IsAdmin(BasePermission):
 
 class IsManager(BasePermission):
     """
-    Permite el acceso a usuarios con rol 'admin' o 'manager'.
+    Permite el acceso a usuarios con rol 'manager' y 'admin' (pero no 'accountant').
     """
     def has_permission(self, request, view):
         return request.user.is_authenticated and request.user.role in ['admin', 'manager']
 
 class IsAccountant(BasePermission):
     """
-    Permite el acceso a usuarios con rol 'admin', 'manager' o 'accountant'.
+    Permite el acceso a usuarios con rol 'accountant' y 'admin' (pero no 'manager').
     """
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role in ['admin', 'manager', 'accountant']
+        return request.user.is_authenticated and request.user.role in ['admin', 'accountant']
