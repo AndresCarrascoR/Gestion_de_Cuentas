@@ -1,3 +1,9 @@
+from __future__ import absolute_import, unicode_literals
+from pathlib import Path
+from datetime import timedelta
+import os
+from celery import Celery
+
 """
 Django settings for gestion_cuentas project.
 
@@ -10,8 +16,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
-from pathlib import Path
-from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_celery_beat'
 ]
 
 MIDDLEWARE = [
@@ -157,4 +162,13 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mi_proyecto.settings')
+
+app = Celery('mi_proyecto')
+
+app.config_from_object('django.conf:settings', namespace='CELERY')
+app.autodiscover_tasks()
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
 

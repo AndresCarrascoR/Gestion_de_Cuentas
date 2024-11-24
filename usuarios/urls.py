@@ -10,6 +10,10 @@ from .views import (
     ProveedorRUCView,
     ProveedorListCreateView,
     ProveedorDetailView,
+    FacturaClienteListCreateView,
+    FacturaClienteDetailView,
+    FacturaProveedorListCreateView,
+    FacturaProveedorDetailView,
 )
 
 urlpatterns = [
@@ -28,4 +32,12 @@ urlpatterns = [
     path('proveedores/actualizar-ruc/', ProveedorRUCView.as_view(), name='proveedor_actualizar_ruc'),
     path('proveedores/', ProveedorListCreateView.as_view(), name='proveedor_list_create'),
     path('proveedores/<int:pk>/', ProveedorDetailView.as_view(), name='proveedor_detail'),
+
+     # Rutas para Facturas de Clientes
+    path('facturas-clientes/', FacturaClienteListCreateView.as_view(), name='factura_cliente_list_create'),
+    path('facturas-clientes/<int:pk>/', FacturaClienteDetailView.as_view(), name='factura_cliente_detail'),
+
+    # Rutas para Facturas de Proveedores
+    path('facturas-proveedores/', FacturaProveedorListCreateView.as_view(), name='factura_proveedor_list_create'),
+    path('facturas-proveedores/<int:pk>/', FacturaProveedorDetailView.as_view(), name='factura_proveedor_detail'),
 ]
