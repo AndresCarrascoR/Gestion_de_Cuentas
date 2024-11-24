@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser, Cliente
+from .models import CustomUser, Cliente, Proveedor
 from django.core.exceptions import PermissionDenied
 from django.utils.timezone import now
 from django.contrib.admin import SimpleListFilter
@@ -72,3 +72,12 @@ def actualizar_desde_dni(modeladmin, request, queryset):
 class ClienteAdmin(admin.ModelAdmin):
     list_display = ("nombre", "ruc", "dni", "direccion", "estado")
     actions = [actualizar_desde_ruc, actualizar_desde_dni]
+
+@admin.register(Proveedor)
+class ProveedorAdmin(admin.ModelAdmin):
+    list_display = ('id', 'nombre', 'direccion', 'telefono', 'email', 'estado')  # Campos a mostrar en la lista
+    search_fields = ('nombre', 'ruc')  # Campos por los que se puede buscar
+    list_filter = ('estado',)  # Filtros para el panel de administración
+    ordering = ('nombre',)  # Orden predeterminado
+    fields = ('ruc', 'nombre', 'direccion', 'telefono', 'email', 'estado')  # Campos que se mostrarán en el formulario
+    readonly_fields = ('id',)  # Campos de solo lectura

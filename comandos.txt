@@ -1,5 +1,144 @@
 pip freeze
 pip freeze > requirements.txt
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 pip install -r requirements.txt
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+API TOKEN
+        49d400db4cb31a20a95cedc2bec27e533d8debfcfac4530d31b5632e1571e4d5
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------   
+admin
+
+
+{
+  "username": "augusto",
+  "password": "augusto"
+}
+
+{
+    "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTczMjQzNzIwMSwiaWF0IjoxNzMyMzUwODAxLCJqdGkiOiIyZWExYjkzZjNiNjg0MGU0YTFiMTA3MDA5NzZjNGU1YyIsInVzZXJfaWQiOjJ9.p85vvmYrMxUAslroNWr7dbFOnQzBqb3iJ7XIw0tdyr0"
+    "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMzMjc5MTMyLCJpYXQiOjE3MzIzNTA4MDEsImp0aSI6ImVlODdhNjg4OTY0ODQyNjNhODNlMzllYjQ5MDNjZmE5IiwidXNlcl9pZCI6Mn0.3VAA-m3dEDVMe36-Y29Wn_whUWq0D6-_DoCS36t-Vl0"
+}
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+{
+  "username": "lleremias",
+  "password": "zetax123"
+}
+
+{
+    "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTczMzI2MTgxNiwiaWF0IjoxNzMyMzk3ODE2LCJqdGkiOiJhYmE4NjEyZWMwMDc0ZGRiODczYmMzZjk0YzVmNDYxMiIsInVzZXJfaWQiOjR9.qW3Tc8Afx8jC_gLj0uF00uQEDFUoK1LaCfN_BNTdeQw",
+    "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMzMjYxODE2LCJpYXQiOjE3MzIzOTc4MTYsImp0aSI6IjcxY2RmN2U0NDdlNzQ3MGZhYTdiOTE1YmI2OGI5ZDJjIiwidXNlcl9pZCI6NH0.IR7jT0WTL6pIDQ1gIdmiux751Rr2yjvTKTYO6Rrbcn4"
+}
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+{
+  "username": "brittanny",
+  "password": "zetax123"
+}
+
+
+{
+    "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTczMzI3ODUzOSwiaWF0IjoxNzMyNDE0NTM5LCJqdGkiOiIwZTU0NDY5ODE1N2Q0NjU4YWM3YzEyOGM4ZDcyMTVlZSIsInVzZXJfaWQiOjN9.lqC93KYUT4C1X-Wf8Rm77VHdXe_NNwUZlUEfteRQ54s",
+    "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMzMjc4NTM5LCJpYXQiOjE3MzI0MTQ1MzksImp0aSI6IjVjMmE4YTc2MzhkNjQ1ZDlhODhmNGEyNjdlYjNmYWUwIiwidXNlcl9pZCI6M30.MMpSZBjV0Sgq6U2ApivwVholFbwRnNWw2kM6pyQNG80"
+}
+
+
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+[
+    {
+        "id": 1,
+        "nombre": "Empresa de Ejemplo SAC",
+        "ruc": "20123456789",
+        "dni": null,
+        "direccion": "Av. Ejemplo 123",
+        "telefono": "",
+        "email": "",
+        "estado": "ACTIVO"
+    }
+]
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Key                                         Value
+Authorization                               Bearer 
+Content-Type                                application/json
+
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Token inválido:
+Si ves un error 401 Unauthorized, asegúrate de enviar correctamente el token en los headers.
+Acceso denegado:
+Si ves un error 403 Forbidden, verifica que el usuario tenga permisos adecuados.
+Cliente/Proveedor no encontrado:
+Si ves un error 404 Not Found, asegúrate de usar un ID válido
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Casos donde deben ser reales:
+Sistemas en producción:
+
+Si el sistema estará conectado a servicios oficiales (como SUNAT en Perú), los RUCs y DNIs deben ser reales y válidos.
+Esto asegura la validez de los datos y la correcta integración con sistemas externos.
+Las APIs de consulta (como las que usas) suelen devolver errores si los datos son falsos.
+Regulación o auditorías:
+
+Si el sistema se utiliza en un entorno regulado, como contabilidad o facturación, los datos reales son obligatorios.
+Casos donde no necesitan ser reales:
+Desarrollo o pruebas:
+
+Puedes usar datos ficticios para probar el sistema.
+Ejemplo:
+RUC: "20123456789" (cumple el formato pero no es real).
+DNI: "12345678".
+Esto evita que se hagan múltiples consultas innecesarias a la API, reduciendo costos o límites de uso.
+Datos internos sin consulta externa:
+
+Si el sistema solo guarda datos como referencia sin validarlos externamente.
+Recomendaciones:
+Entorno de desarrollo:
+Usa datos ficticios para pruebas locales.
+Desactiva las consultas reales a la API (simula respuestas con datos estáticos).
+Entorno de producción:
+Habilita validaciones para que solo se permitan RUCs y DNIs reales.
+Valida con las respuestas de la API.
