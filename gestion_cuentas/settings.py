@@ -1,8 +1,7 @@
 from __future__ import absolute_import, unicode_literals
+import os
 from pathlib import Path
 from datetime import timedelta
-import os
-from celery import Celery
 
 """
 Django settings for gestion_cuentas project.
@@ -21,6 +20,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -30,22 +30,42 @@ SECRET_KEY = 'django-insecure-*k1gx_+2ia)8vbz7q$_q(m6)60!-=e*ds*+bg37pty1#-6ovs%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
+}
+
 ALLOWED_HOSTS = []
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'usuarios.apps.UsuariosConfig',
+    # Apps propias
+    'usuarios.apps.UsuariosConfig',  # App personalizada
+    'facturas.apps.FacturasConfig',  # App para facturas (si aplica)
+     # Apps de terceros
     'rest_framework',  # Para Django Rest Framework
     'rest_framework_simplejwt',  # Para JWT
-    'django.contrib.admin',
-    'django.contrib.auth',
+    'django_celery_beat',  # Tareas programadas con Celery Beat
+    # 'django_celery_results',  # Opcional: Guardar resultados de tareas en la BD
+    'django.contrib.admin',  # Administración de Django
+    'django.contrib.auth',  # Autenticación
+    # Apps de Django
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_celery_beat'
+    
 ]
 
 MIDDLEWARE = [
@@ -139,6 +159,13 @@ SIMPLE_JWT = {
     'TOKEN_TYPE_CLAIM': 'token_type',
 }
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Servidor SMTP de Gmail
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'andres.carrasco@tecsup.edu.pe'  # Cambia al correo real
+EMAIL_HOST_PASSWORD = 'zetax12345678'    # Contraseña del correo
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
@@ -162,13 +189,8 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Configuración de Celery con Redis remoto
+CELERY_BROKER_URL = 'redis://:243tPc90zRzvXB2kUoz7rTaMevRJkTBF@redis-11443.c336.samerica-east1-1.gce.redns.redis-cloud.com:11443'
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mi_proyecto.settings')
-
-app = Celery('mi_proyecto')
-
-app.config_from_object('django.conf:settings', namespace='CELERY')
-app.autodiscover_tasks()
-
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
 

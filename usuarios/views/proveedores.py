@@ -1,9 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics, status
-from usuarios.models import Proveedor, FacturaProveedor
+from usuarios.models import Proveedor
 from usuarios.permissions import IsAdmin
-from usuarios.serializers import ProveedorSerializer, FacturaProveedorSerializer
+from usuarios.serializers import ProveedorSerializer
 from rest_framework.permissions import IsAuthenticated
 from usuarios.utils import consulta_ruc
 
@@ -86,21 +86,3 @@ class ProveedorDetailView(generics.RetrieveUpdateDestroyAPIView):
             )
         return super().destroy(request, *args, **kwargs)
 
-# Facturas de Proveedores
-class FacturaProveedorListCreateView(generics.ListCreateAPIView):
-    queryset = FacturaProveedor.objects.all()
-    serializer_class = FacturaProveedorSerializer
-    permission_classes = [IsAuthenticated]
-
-    def perform_create(self, serializer):
-        factura = serializer.save()
-        factura.actualizar_estado()
-
-class FacturaProveedorDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = FacturaProveedor.objects.all()
-    serializer_class = FacturaProveedorSerializer
-    permission_classes = [IsAuthenticated]
-
-    def perform_update(self, serializer):
-        factura = serializer.save()
-        factura.actualizar_estado()

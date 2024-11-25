@@ -1,6 +1,6 @@
 from .auth import AdminOnlyView, ManagerView, AccountantView
-from .clientes import ClienteRUCView, ClienteDNIView, ClienteListCreateView, ClienteDetailView, FacturaClienteListCreateView, FacturaClienteDetailView
-from .proveedores import ProveedorRUCView, ProveedorListCreateView, ProveedorDetailView, FacturaProveedorListCreateView, FacturaProveedorDetailView
+from .clientes import ClienteRUCView, ClienteDNIView, ClienteListCreateView, ClienteDetailView
+from .proveedores import ProveedorRUCView, ProveedorListCreateView, ProveedorDetailView
 
 __all__ = [
     "AdminOnlyView",
@@ -15,11 +15,6 @@ __all__ = [
     "ProveedorRUCView",
     "ProveedorListCreateView",
     "ProveedorDetailView",
-
-    "FacturaClienteListCreateView",
-    "FacturaClienteDetailView",
-    "FacturaProveedorListCreateView",
-    "FacturaProveedorDetailView",
     
     
     

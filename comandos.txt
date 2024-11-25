@@ -1,7 +1,7 @@
 pip freeze
 pip freeze > requirements.txt
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+redis-server.exe
 
 pip install -r requirements.txt
 
@@ -27,7 +27,7 @@ admin
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
+WebSockets
 
 
 
@@ -100,19 +100,7 @@ Si ves un error 404 Not Found, asegúrate de usar un ID válido
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 Casos donde deben ser reales:
@@ -142,3 +130,34 @@ Desactiva las consultas reales a la API (simula respuestas con datos estáticos)
 Entorno de producción:
 Habilita validaciones para que solo se permitan RUCs y DNIs reales.
 Valida con las respuestas de la API.
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Implementación Detallada
+
+
+Contador (Operativo)
+Permitir:
+  Crear facturas (clientes y proveedores).
+  Actualizar el estado de facturas (sin cambiar otros campos).
+
+No permitir:
+  Eliminar facturas.
+  Acceder a dashboards estratégicos.
+
+
+Gerente (Gestión)
+Permitir:
+  Solo lectura de facturas.
+  Acceso a dashboards y reportes financieros (métricas clave, gráficos).
+
+No permitir:
+  Crear, actualizar o eliminar facturas.
+
+
+Administrador
+Permitir:
+  Todo (CRUD completo de facturas y acceso total a dashboards).

@@ -35,3 +35,13 @@ class FinancialSummaryView(APIView):
     def get(self, request):
         # Lógica para mostrar un resumen financiero
         return Response({"message": "Resumen financiero"})
+
+
+
+class NotificacionesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        notificaciones = Notificacion.objects.filter(usuario=request.user).order_by('-fecha')
+        data = [{"mensaje": n.mensaje, "fecha": n.fecha, "leido": n.leido, "link": n.link} for n in notificaciones]
+        return Response(data)

@@ -1,8 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics, status
-from usuarios.models import Cliente, FacturaCliente
-from usuarios.serializers import ClienteSerializer, FacturaClienteSerializer
+from usuarios.models import Cliente
+from usuarios.serializers import ClienteSerializer
 from usuarios.utils import consulta_ruc, consulta_dni
 from usuarios.permissions import IsAdmin, IsManager, IsAccountant
 from rest_framework.permissions import IsAuthenticated
@@ -122,25 +122,5 @@ class ClienteDetailView(generics.RetrieveUpdateDestroyAPIView):
                 status=status.HTTP_403_FORBIDDEN
             )
         return super().destroy(request, *args, **kwargs)
-
-
-# Facturas de Clientes
-class FacturaClienteListCreateView(generics.ListCreateAPIView):
-    queryset = FacturaCliente.objects.all()
-    serializer_class = FacturaClienteSerializer
-    permission_classes = [IsAuthenticated]
-
-    def perform_create(self, serializer):
-        factura = serializer.save()
-        factura.actualizar_estado()
-
-class FacturaClienteDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = FacturaCliente.objects.all()
-    serializer_class = FacturaClienteSerializer
-    permission_classes = [IsAuthenticated]
-
-    def perform_update(self, serializer):
-        factura = serializer.save()
-        factura.actualizar_estado()
 
 

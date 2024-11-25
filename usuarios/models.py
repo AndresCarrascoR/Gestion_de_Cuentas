@@ -1,6 +1,5 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.utils.timezone import now
 from .utils import consulta_ruc, consulta_dni
 from django.core.exceptions import ValidationError
 
@@ -161,48 +160,23 @@ class Proveedor(models.Model):
         return f"{self.nombre} ({'RUC: ' + self.ruc if self.ruc else 'Sin RUC'})"
 
 
-# -------------------------
-# Base para Facturas
-# -------------------------
-class FacturaBase(models.Model):
-    numero_factura = models.CharField(max_length=50, unique=True, verbose_name="Número de factura")
-    fecha_emision = models.DateField(default=now, verbose_name="Fecha de emisión")
-    fecha_vencimiento = models.DateField(verbose_name="Fecha de vencimiento")
-    monto_total = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Monto total")
-    ESTADOS = [
-        ('pendiente', 'Pendiente'),
-        ('pagada', 'Pagada'),
-        ('vencida', 'Vencida'),
+class Notificacion(models.Model):
+    USUARIO_TIPOS = [
+        ('cliente', 'Cliente'),
+        ('proveedor', 'Proveedor'),
     ]
-    estado = models.CharField(max_length=10, choices=ESTADOS, default='pendiente', verbose_name="Estado")
+    usuario_tipo = models.CharField(max_length=10, choices=USUARIO_TIPOS)
+    usuario_id = models.PositiveIntegerField()
+    mensaje = models.TextField()
+    fecha = models.DateTimeField(auto_now_add=True)
+    leido = models.BooleanField(default=False)
+    link = models.URLField(blank=True, null=True)
 
-    class Meta:
-        abstract = True
-
-    def actualizar_estado(self):
-        if self.estado != 'pagada' and self.fecha_vencimiento < now().date():
-            self.estado = 'vencida'
-            self.save()
-
-    def __str__(self):
-        return f"Factura {self.numero_factura}"
-
-
-# -------------------------
-# Modelo de Facturas para Clientes
-# -------------------------
-class FacturaCliente(FacturaBase):
-    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, verbose_name="Cliente relacionado")
+    def get_usuario(self):
+        if self.usuario_tipo == 'cliente':
+            return Cliente.objects.get(id=self.usuario_id)
+        elif self.usuario_tipo == 'proveedor':
+            return Proveedor.objects.get(id=self.usuario_id)
 
     def __str__(self):
-        return f"{super().__str__()} - Cliente: {self.cliente}"
-
-
-# -------------------------
-# Modelo de Facturas para Proveedores
-# -------------------------
-class FacturaProveedor(FacturaBase):
-    proveedor = models.ForeignKey(Proveedor, on_delete=models.CASCADE, verbose_name="Proveedor relacionado")
-
-    def __str__(self):
-        return f"{super().__str__()} - Proveedor: {self.proveedor}"
+        return f"Notificación para {self.usuario_tipo} {self.usuario_id} - {self.mensaje}"
