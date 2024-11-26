@@ -1,4 +1,4 @@
-from .auth import AdminOnlyView, ManagerView, AccountantView
+from .auth import AdminOnlyView, ManagerView, AccountantView , FinancialSummaryView
 from .clientes import ClienteRUCView, ClienteDNIView, ClienteListCreateView, ClienteDetailView
 from .proveedores import ProveedorRUCView, ProveedorListCreateView, ProveedorDetailView
 
@@ -16,6 +16,6 @@ __all__ = [
     "ProveedorListCreateView",
     "ProveedorDetailView",
     
-    
+    "FinancialSummaryView",
     
 ]

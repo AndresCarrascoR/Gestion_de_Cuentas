@@ -1,16 +1,13 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from usuarios.permissions import IsAdmin, IsAccountant, IsManager
-from rest_framework import status
 from .models import FacturaCliente
 from .serializers import FacturaClienteSerializer
-from .tasks import (
-    actualizar_estados_facturas,
-    notificar_facturas_proximas_vencer,
-    notificar_facturas_vencidas
-)
+from celery import current_app
+
 
 class FacturaClienteView(ListCreateAPIView):
     queryset = FacturaCliente.objects.all()
@@ -53,47 +50,20 @@ class DetalleFacturaClienteView(RetrieveUpdateDestroyAPIView):
         return super().delete(request, *args, **kwargs)
 
 
-
 class ActualizarEstadosFacturasView(APIView):
     """
-    Vista para actualizar estados de facturas llamando a la tarea Celery.
+    Vista para actualizar estados de facturas automáticamente
     """
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        actualizar_estados_facturas.delay()
+        current_app.send_task('facturas.tasks.actualizar_estados_facturas')
         return Response(
-            {"message": "Tarea para actualizar estados de facturas enviada al worker."},
+            {"message": "Tarea de actualización de estados iniciada"},
             status=status.HTTP_202_ACCEPTED
         )
 
 
-class NotificarFacturasProximasView(APIView):
-    """
-    Vista para notificar facturas próximas a vencer llamando a la tarea Celery.
-    """
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, *args, **kwargs):
-        notificar_facturas_proximas_vencer.delay()
-        return Response(
-            {"message": "Tarea para notificar facturas próximas a vencer enviada al worker."},
-            status=status.HTTP_202_ACCEPTED
-        )
-
-
-class NotificarFacturasVencidasView(APIView):
-    """
-    Vista para notificar facturas vencidas llamando a la tarea Celery.
-    """
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, *args, **kwargs):
-        notificar_facturas_vencidas.delay()
-        return Response(
-            {"message": "Tarea para notificar facturas vencidas enviada al worker."},
-            status=status.HTTP_202_ACCEPTED
-        )
 
 
 

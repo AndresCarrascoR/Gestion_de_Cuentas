@@ -11,7 +11,7 @@ class AdminOnlyView(APIView):
 
 # Vista para módulos de estadísticas (gerente)
 class ManagerView(APIView):
-    permission_classes = [IsAuthenticated, IsManager]
+    permission_classes = [IsAuthenticated, IsAdmin | IsManager]
 
     # Lógica para reportes y estadísticas
     def get(self, request):
@@ -19,7 +19,7 @@ class ManagerView(APIView):
 
 # Vista para módulos financieros (contador)
 class AccountantView(APIView):
-    permission_classes = [IsAuthenticated, IsAccountant]
+    permission_classes = [IsAuthenticated, IsAdmin | IsAccountant]
 
     # Lógica para datos contables
     def get(self, request):
@@ -28,9 +28,9 @@ class AccountantView(APIView):
 
 class FinancialSummaryView(APIView):
     """
-    Permite a los contadores y gerentes ver un resumen financiero, pero no editar.
+    Permite a los administradores, contadores y gerentes ver un resumen financiero.
     """
-    permission_classes = [IsAuthenticated, IsManager | IsAccountant]
+    permission_classes = [IsAuthenticated, IsAdmin | IsManager | IsAccountant]
 
     def get(self, request):
         # Lógica para mostrar un resumen financiero
@@ -38,10 +38,3 @@ class FinancialSummaryView(APIView):
 
 
 
-class NotificacionesView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        notificaciones = Notificacion.objects.filter(usuario=request.user).order_by('-fecha')
-        data = [{"mensaje": n.mensaje, "fecha": n.fecha, "leido": n.leido, "link": n.link} for n in notificaciones]
-        return Response(data)

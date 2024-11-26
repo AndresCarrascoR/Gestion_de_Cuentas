@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     # Apps propias
     'usuarios.apps.UsuariosConfig',  # App personalizada
     'facturas.apps.FacturasConfig',  # App para facturas (si aplica)
+    'notificaciones.apps.NotificacionesConfig',  # Corregido
      # Apps de terceros
     'rest_framework',  # Para Django Rest Framework
     'rest_framework_simplejwt',  # Para JWT
@@ -192,5 +193,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Configuración de Celery con Redis remoto
 CELERY_BROKER_URL = 'redis://:243tPc90zRzvXB2kUoz7rTaMevRJkTBF@redis-11443.c336.samerica-east1-1.gce.redns.redis-cloud.com:11443'
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+CELERY_BROKER_POOL_LIMIT = 10  # Reduce la cantidad de conexiones simultáneas
+CELERY_BROKER_HEARTBEAT = 10   # Mantén conexiones activas con un ping regular
+CELERY_BROKER_CONNECTION_RETRY = True
+CELERY_BROKER_CONNECTION_MAX_RETRIES = None
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
+
 
 

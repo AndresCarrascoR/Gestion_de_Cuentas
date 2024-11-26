@@ -5,7 +5,7 @@ redis-server.exe
 
 pip install -r requirements.txt
 
-
+celery -A gestion_cuentas worker --loglevel=info --concurrency=1 --pool=solo
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 API TOKEN
@@ -20,8 +20,8 @@ admin
 }
 
 {
-    "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTczMjQzNzIwMSwiaWF0IjoxNzMyMzUwODAxLCJqdGkiOiIyZWExYjkzZjNiNjg0MGU0YTFiMTA3MDA5NzZjNGU1YyIsInVzZXJfaWQiOjJ9.p85vvmYrMxUAslroNWr7dbFOnQzBqb3iJ7XIw0tdyr0"
-    "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMzMjc5MTMyLCJpYXQiOjE3MzIzNTA4MDEsImp0aSI6ImVlODdhNjg4OTY0ODQyNjNhODNlMzllYjQ5MDNjZmE5IiwidXNlcl9pZCI6Mn0.3VAA-m3dEDVMe36-Y29Wn_whUWq0D6-_DoCS36t-Vl0"
+    "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTczMzQ2MjQ5NCwiaWF0IjoxNzMyNTk4NDk0LCJqdGkiOiIxODA3ZjFkM2EwMmI0ODE1OTkwYWU1MzlkMTA2ZjA2OSIsInVzZXJfaWQiOjJ9.RweUVqxOb32gf2ePeiaH1WwWrL9Ams5gvPjU8CkPlZs",
+    "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMzNDYzMzU3LCJpYXQiOjE3MzI1OTg0OTQsImp0aSI6IjYyYTY0NzZlYjdlMjRhNzBhMjVmZTg2ZTM1NjUzYjQzIiwidXNlcl9pZCI6Mn0.HgxBxRNVTW7UnR_KQ13x7pIw9syN9ASg8tkYIXE57WI"
 }
 
 

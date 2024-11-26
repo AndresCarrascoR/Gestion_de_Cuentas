@@ -81,3 +81,5 @@ class ProveedorAdmin(admin.ModelAdmin):
     ordering = ('nombre',)  # Orden predeterminado
     fields = ('ruc', 'nombre', 'direccion', 'telefono', 'email', 'estado')  # Campos que se mostrarán en el formulario
     readonly_fields = ('id',)  # Campos de solo lectura
+
+

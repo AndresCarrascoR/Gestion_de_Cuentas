@@ -160,23 +160,4 @@ class Proveedor(models.Model):
         return f"{self.nombre} ({'RUC: ' + self.ruc if self.ruc else 'Sin RUC'})"
 
 
-class Notificacion(models.Model):
-    USUARIO_TIPOS = [
-        ('cliente', 'Cliente'),
-        ('proveedor', 'Proveedor'),
-    ]
-    usuario_tipo = models.CharField(max_length=10, choices=USUARIO_TIPOS)
-    usuario_id = models.PositiveIntegerField()
-    mensaje = models.TextField()
-    fecha = models.DateTimeField(auto_now_add=True)
-    leido = models.BooleanField(default=False)
-    link = models.URLField(blank=True, null=True)
 
-    def get_usuario(self):
-        if self.usuario_tipo == 'cliente':
-            return Cliente.objects.get(id=self.usuario_id)
-        elif self.usuario_tipo == 'proveedor':
-            return Proveedor.objects.get(id=self.usuario_id)
-
-    def __str__(self):
-        return f"Notificación para {self.usuario_tipo} {self.usuario_id} - {self.mensaje}"

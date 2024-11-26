@@ -27,5 +27,6 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('usuarios/', include('usuarios.urls')),  # Incluye las rutas de la app usuarios
     path('facturas/', include('facturas.urls')),
+    path('notificaciones/', include('notificaciones.urls')),
 
 ]
