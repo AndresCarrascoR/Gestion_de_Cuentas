@@ -15,14 +15,12 @@ admin
 
 
 {
-  "username": "augusto",
-  "password": "augusto"
+  "username": "mandrimax",
+  "password": "mandrimax"
 }
 
-{
-    "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTczMzQ2MjQ5NCwiaWF0IjoxNzMyNTk4NDk0LCJqdGkiOiIxODA3ZjFkM2EwMmI0ODE1OTkwYWU1MzlkMTA2ZjA2OSIsInVzZXJfaWQiOjJ9.RweUVqxOb32gf2ePeiaH1WwWrL9Ams5gvPjU8CkPlZs",
-    "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMzNDYzMzU3LCJpYXQiOjE3MzI1OTg0OTQsImp0aSI6IjYyYTY0NzZlYjdlMjRhNzBhMjVmZTg2ZTM1NjUzYjQzIiwidXNlcl9pZCI6Mn0.HgxBxRNVTW7UnR_KQ13x7pIw9syN9ASg8tkYIXE57WI"
-}
+ "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTczMzU4ODY2OSwiaWF0IjoxNzMyNzI0NjY5LCJqdGkiOiJjMDY4Y2YyNjM0ODU0MGI2YjIxNGJlY2FlZjRhMTc4NiIsInVzZXJfaWQiOjF9.iB46LFixcDEKFbSHo9mqhFvHX_sypz4BJVhe5mvDowY",
+    "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMzNTg4NjY5LCJpYXQiOjE3MzI3MjQ2NjksImp0aSI6IjVlZWZmMTI5NjA4NzRlMmJhYjE2Nzk1NTdiZTZmYjQ2IiwidXNlcl9pZCI6MX0.59BauGzd4pZEvsi4a_E85oe-6GpTuPZkH6UwVhS5teE"
 
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -161,3 +159,102 @@ No permitir:
 Administrador
 Permitir:
   Todo (CRUD completo de facturas y acceso total a dashboards).
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+  / (Raíz del proyecto)
+├── admin/                             # Panel de administración de Django
+├── api/
+│   ├── token/                         # Autenticación JWT
+│   │   ├──                           TokenObtainPairView
+│   │   ├── refresh/                  TokenRefreshView
+│   └── usuarios/                      # Aplicación de usuarios
+ 
+│       ├── clientes/                 # Submódulo Clientes
+│       │   ├── actualizar-ruc/       ClienteRUCView
+│       │   ├── actualizar-dni/       ClienteDNIView
+│       │   ├──                       ClienteListCreateView
+│       │   └── <int:pk>/             ClienteDetailView
+│       ├── proveedores/              # Submódulo Proveedores
+│       │   ├── actualizar-ruc/       ProveedorRUCView
+│       │   ├──                       ProveedorListCreateView
+│       │   └── <int:pk>/             ProveedorDetailView
+│       ├── dashboard/                DashboardView (Gerente)
+│       ├── exportar/<str:formato>/   ExportarDatosView (Gerente)
+│       ├── importar/                 ImportarFacturasView (Gerente)
+│       └── financial-summary/        FinancialSummaryView (Todos)
+├── facturas/
+│   ├── ver                           FacturaClienteView
+│   ├── listar/                       ListarFacturasClienteView
+│   ├── <int:pk>/                     DetalleFacturaClienteView
+│   └── actualizar-estados/           ActualizarEstadosFacturasView
+└── notificaciones/
+    ├── ver                           ListarNotificacionesView
+    ├── notificar-proximas/           NotificarFacturasProximasView
+    └── notificar-vencidas/           NotificarFacturasVencidasView
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+/api
+│
+├── /auth
+│   ├── /login               # Autenticación de usuarios (JWT)
+│   ├── /logout              # Cerrar sesión
+│   ├── /register            # Registro de nuevos usuarios (si aplica)
+│   └── /profile             # Datos del perfil del usuario autenticado
+│
+├── /users
+│   ├── /                   # Listado de usuarios (Administrador)
+│   ├── /<user_id>          # Detalle de un usuario específico
+│   ├── /<user_id>/roles    # Gestión de roles de un usuario
+│   └── /permissions        # Lista de permisos disponibles
+│
+├── /clients
+│   ├── /                   # Listado de clientes
+│   ├── /<client_id>        # Detalle de un cliente específico
+│   └── /<client_id>/invoices  # Facturas asociadas a un cliente
+│
+├── /suppliers
+│   ├── /                   # Listado de proveedores
+│   ├── /<supplier_id>      # Detalle de un proveedor específico
+│   └── /<supplier_id>/invoices  # Facturas asociadas a un proveedor
+│
+├── /invoices
+│   ├── /accounts-receivable # Facturas por cobrar
+│   │   ├── /               # Listado de facturas por cobrar
+│   │   ├── /<invoice_id>   # Detalle de una factura por cobrar
+│   │   ├── /overdue        # Facturas vencidas
+│   │   └── /upcoming       # Facturas próximas a vencer
+│   │
+│   ├── /accounts-payable    # Facturas por pagar
+│   │   ├── /               # Listado de facturas por pagar
+│   │   ├── /<invoice_id>   # Detalle de una factura por pagar
+│   │   ├── /overdue        # Facturas vencidas
+│   │   └── /upcoming       # Facturas próximas a vencer
+│   │
+│   ├── /import             # Importar facturas desde CSV o Excel
+│   └── /export             # Exportar facturas a Excel o PDF
+│
+├── /dashboard
+│   ├── /                   # Dashboard principal
+│   ├── /metrics            # Métricas clave
+│   ├── /charts             # Gráficos de barras y otros visuales
+│   └── /cashflow           # Proyección de flujo de caja
+│
+├── /notifications
+│   ├── /                   # Listado de notificaciones
+│   ├── /overdue            # Notificaciones de facturas vencidas
+│   ├── /upcoming           # Notificaciones de facturas próximas a vencer
+│   └── /send-email         # Envío de correos automáticos
+│
+└── /settings
+    ├── /                   # Configuración general
+    ├── /email              # Configuración de correo electrónico
+    ├── /roles              # Configuración de roles y permisos
+    └── /notifications      # Configuración de notificaciones

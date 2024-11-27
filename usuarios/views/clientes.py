@@ -13,7 +13,7 @@ from rest_framework.permissions import IsAuthenticated
 class ClienteRUCView(APIView):
     permission_classes = [IsAuthenticated, IsAdmin]
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         ruc = request.data.get("ruc")
         token = request.data.get("token")
 
@@ -22,32 +22,28 @@ class ClienteRUCView(APIView):
         if not token:
             return Response({"error": "El token es obligatorio."}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Consulta externa
         try:
-            cliente, created = Cliente.objects.get_or_create(ruc=ruc)
-            resultado = cliente.actualizar_desde_ruc(token)
-            if "error" in resultado:
-                return Response(resultado, status=status.HTTP_400_BAD_REQUEST)
-
-            return Response({
-                "success": True,
-                "message": "Cliente creado." if created else "Cliente actualizado.",
-                "data": resultado["datos"],
-                "cambios": resultado.get("cambios", []),
-                "created": created
-            }, status=status.HTTP_200_OK)
-        except ValueError as e:
+            datos_ruc = consulta_ruc(ruc, token)  # Lógica para consumir la API de RUC
+            serializer = ClienteSerializer(data={
+                "nombre": datos_ruc.get("name"),
+                "ruc": ruc,
+                "direccion": datos_ruc.get("address"),
+                "estado": datos_ruc.get("status"),
+            })
+            serializer.is_valid(raise_exception=True)
+            cliente = serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 # Consulta de DNI
 class ClienteDNIView(APIView):
-    """
-    Consulta DNI y actualiza o crea un cliente en la base de datos.
-    Solo para administradores.
-    """
     permission_classes = [IsAuthenticated, IsAdmin]
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         dni = request.data.get("dni")
         token = request.data.get("token")
 
@@ -56,20 +52,20 @@ class ClienteDNIView(APIView):
         if not token:
             return Response({"error": "El token es obligatorio."}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Consulta externa
         try:
-            cliente, created = Cliente.objects.get_or_create(dni=dni)
-            datos = cliente.actualizar_desde_dni(token)
-            if "error" in datos:
-                return Response(datos, status=status.HTTP_400_BAD_REQUEST)
-
-            return Response({
-                "success": True,
-                "message": "Datos procesados correctamente.",
-                "data": datos,
-                "created": created
-            }, status=status.HTTP_200_OK)
-        except ValueError as e:
+            datos_dni = consulta_dni(dni, token)  # Lógica para consumir la API de DNI
+            serializer = ClienteSerializer(data={
+                "nombre": datos_dni.get("full_name"),
+                "dni": dni,
+                "direccion": datos_dni.get("address"),
+            })
+            serializer.is_valid(raise_exception=True)
+            cliente = serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 

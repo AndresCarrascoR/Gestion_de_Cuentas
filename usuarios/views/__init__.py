@@ -1,14 +1,17 @@
-from .auth import AdminOnlyView, ManagerView, AccountantView , FinancialSummaryView
 from .clientes import ClienteRUCView, ClienteDNIView, ClienteListCreateView, ClienteDetailView
 from .proveedores import ProveedorRUCView, ProveedorListCreateView, ProveedorDetailView
-
+from .gerente import DashboardView, ExportarDatosView, ImportarFacturasView
+from .auth import VistaRegistroUsuario
 __all__ = [
+    "VistaRegistroUsuario",
+    "VistaObtenerToken",
+    
     "AdminOnlyView",
     "ManagerView",
     "AccountantView",
 
     "ClienteRUCView",
-    "ClienteDNIView",  # Asegúrate de incluir esta línea para evitar errores de importación
+    "ClienteDNIView",
     "ClienteListCreateView",
     "ClienteDetailView",
 
@@ -18,4 +21,7 @@ __all__ = [
     
     "FinancialSummaryView",
     
+    "DashboardView",
+    "ExportarDatosView",
+    "ImportarFacturasView",
 ]

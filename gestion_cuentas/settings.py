@@ -61,6 +61,8 @@ INSTALLED_APPS = [
     # 'django_celery_results',  # Opcional: Guardar resultados de tareas en la BD
     'django.contrib.admin',  # Administración de Django
     'django.contrib.auth',  # Autenticación
+    #react
+    'corsheaders',
     # Apps de Django
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -70,6 +72,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+     'corsheaders.middleware.CorsMiddleware',  # Debe estar antes de CommonMiddleware
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -200,5 +203,9 @@ CELERY_BROKER_CONNECTION_MAX_RETRIES = None
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
 
+# Permitir solicitudes desde tu frontend
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # Cambia esto si tu frontend está en otro puerto
+]
 
 

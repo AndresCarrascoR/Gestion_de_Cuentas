@@ -12,8 +12,8 @@ from django.core.exceptions import ValidationError
 class CustomUser(AbstractUser):
     ROLE_CHOICES = [
         ('admin', 'Administrador'),
-        ('accountant', 'Contador'),
-        ('manager', 'Gerente'),
+        ('gerente', 'Gerente'),
+        ('contador', 'Contador'),
     ]
     role = models.CharField(
         max_length=20,
@@ -31,133 +31,67 @@ class CustomUser(AbstractUser):
         return f"{self.username} ({self.get_role_display()})"
 
 
+
+
+class BasePersona(models.Model):
+    """
+    Clase base para Cliente y Proveedor.
+    """
+    nombre = models.CharField(max_length=255)  # Nombre o razón social
+    direccion = models.TextField(blank=True, null=True)  # Dirección completa
+    telefono = models.CharField(max_length=20, blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
+    estado = models.CharField(max_length=20, default="ACTIVO")  # Ejemplo: ACTIVO, INACTIVO
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True  # No crea una tabla en la base de datos
+
+    def __str__(self):
+        return self.nombre
+    
+
+
 # -------------------------
 # Modelo de Cliente
 # -------------------------
-class Cliente(models.Model):
-    ESTADOS = [
-        ('ACTIVO', 'Activo'),
-        ('INACTIVO', 'Inactivo'),
-    ]
+class Cliente(BasePersona):
+    dni = models.CharField(max_length=8, unique=True, blank=True, null=True)
+    ruc = models.CharField(max_length=11, unique=True, blank=True, null=True)
+    fecha_nacimiento = models.DateField(blank=True, null=True)
+    departamento = models.CharField(max_length=100, blank=True, null=True)
+    provincia = models.CharField(max_length=100, blank=True, null=True)
+    distrito = models.CharField(max_length=100, blank=True, null=True)
+    ubigeo = models.CharField(max_length=6, blank=True, null=True)
 
-    nombre = models.CharField(max_length=255, verbose_name="Nombre o Razón Social")
-    ruc = models.CharField(max_length=11, unique=True, blank=True, null=True, verbose_name="RUC")
-    dni = models.CharField(max_length=8, unique=True, blank=True, null=True, verbose_name="DNI")
-    direccion = models.TextField(blank=True, verbose_name="Dirección")
-    telefono = models.CharField(max_length=15, blank=True, verbose_name="Teléfono")
-    email = models.EmailField(blank=True, verbose_name="Correo electrónico")
-    estado = models.CharField(
-        max_length=10,
-        choices=ESTADOS,
-        default='ACTIVO',
-        verbose_name="Estado"
-    )
-
-    def actualizar_desde_ruc(self, token):
+    def save(self, *args, **kwargs):
         """
-        Consulta la API de RUC y actualiza los datos del cliente.
+        Valida que al menos uno de los campos RUC o DNI esté presente.
         """
-        from usuarios.utils import consulta_ruc  # Evitar importaciones circulares.
-        
-        if not self.ruc:
-            raise ValueError("El RUC es obligatorio para esta operación.")
-        
-        datos = consulta_ruc(self.ruc, token)
-        if "error" not in datos:
-            cambios = []
-            if self.nombre != datos.get("name", self.nombre):
-                self.nombre = datos.get("name", self.nombre)
-                cambios.append("nombre")
-            if self.direccion != datos.get("address", self.direccion):
-                self.direccion = datos.get("address", self.direccion)
-                cambios.append("direccion")
-            if self.estado != datos.get("status", self.estado):
-                self.estado = datos.get("status", self.estado)
-                cambios.append("estado")
-            
-            self.save()
-            return {"cambios": cambios, "datos": datos}
-        
-        return datos
+        if not self.ruc and not self.dni:
+            raise ValueError("Debe especificar al menos un RUC o un DNI para el cliente.")
+        super().save(*args, **kwargs)
 
-    def actualizar_desde_dni(self, token):
-        """
-        Consulta la API de DNI y actualiza los datos del cliente.
-        """
-        from usuarios.utils import consulta_dni  # Evitar importaciones circulares.
 
-        if not self.dni:
-            raise ValueError("El DNI es obligatorio para esta operación.")
 
-        datos = consulta_dni(self.dni, token)
-        if "error" not in datos:
-            cambios = []
-            if self.nombre != datos.get("full_name", self.nombre):
-                self.nombre = datos.get("full_name", self.nombre)
-                cambios.append("nombre")
-
-            self.save()
-            return {"cambios": cambios, "datos": datos}
-
-        return datos
 
 
 # -------------------------
 # Modelo de Proveedor
 # -------------------------
-class Proveedor(models.Model):
-    ESTADOS = [
-        ('ACTIVO', 'Activo'),
-        ('INACTIVO', 'Inactivo'),
-    ]
-
-    nombre = models.CharField(max_length=255, unique=True, verbose_name="Nombre del proveedor")
-    ruc = models.CharField(max_length=11, unique=True, blank=True, null=True, verbose_name="RUC")
-    direccion = models.TextField(blank=True, verbose_name="Dirección")
-    telefono = models.CharField(max_length=15, blank=True, verbose_name="Teléfono")
-    email = models.EmailField(blank=True, verbose_name="Correo electrónico")
-    estado = models.CharField(
-        max_length=10,
-        choices=ESTADOS,
-        default='ACTIVO',
-        verbose_name="Estado"
-    )
-
-    def actualizar_desde_ruc(self, token):
-        """
-        Consulta la API de RUC y actualiza los datos del proveedor.
-        """
-        from usuarios.utils import consulta_ruc  # Evitar importaciones circulares.
-
-        if not self.ruc:
-            raise ValueError("El RUC es obligatorio para esta operación.")
-
-        datos = consulta_ruc(self.ruc, token)
-        if "error" not in datos:
-            cambios = []
-            if self.nombre != datos.get("name", self.nombre):
-                self.nombre = datos.get("name", self.nombre)
-                cambios.append("nombre")
-            if self.direccion != datos.get("address", self.direccion):
-                self.direccion = datos.get("address", self.direccion)
-                cambios.append("direccion")
-            if self.estado != datos.get("status", self.estado):
-                self.estado = datos.get("status", self.estado)
-                cambios.append("estado")
-            self.save()
-            return {"cambios": cambios, "data": datos}
-        return datos
-
-    def save(self, *args, **kwargs):
-        """
-        Validar que el RUC esté presente.
-        """
-        if not self.ruc:
-            raise ValueError("El RUC es obligatorio para registrar un proveedor.")
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return f"{self.nombre} ({'RUC: ' + self.ruc if self.ruc else 'Sin RUC'})"
-
-
+class Proveedor(BasePersona):
+    """
+    Modelo para proveedores.
+    """
+    ruc = models.CharField(max_length=11, unique=True)
+    linea_negocio = models.CharField(max_length=255, blank=True, null=True)  # Línea de negocio
+    condiciones_domicilio = models.CharField(max_length=50, blank=True, null=True)  # Ejemplo: HABIDO
+    tipo_persona = models.CharField(max_length=50, blank=True, null=True)  # Ejemplo: PERSONA JURÍDICA
+    departamento = models.CharField(max_length=100, blank=True, null=True)
+    provincia = models.CharField(max_length=100, blank=True, null=True)
+    distrito = models.CharField(max_length=100, blank=True, null=True)
+    ubigeo = models.CharField(max_length=6, blank=True, null=True)
+    fecha_creacion_ruc = models.DateField(blank=True, null=True)  # Fecha de creación del RUC
+    fecha_actualizacion_ruc = models.DateField(blank=True, null=True)
 
